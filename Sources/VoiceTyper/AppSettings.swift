@@ -67,7 +67,7 @@ struct AppSettings: Codable, Equatable {
         hotkey: .defaultHotkey,
         fallbackToPaste: true,
         restoreClipboard: true,
-        language: "zh",
+        language: "auto",
         convertChineseToSimplified: true
     )
 

@@ -3,7 +3,7 @@ import Foundation
 @MainActor
 final class WhisperTranscriber {
     private let binaryName = "whisper-cli"
-    private let modelName = "ggml-base.bin"
+    private let modelName = "ggml-small.bin"
 
     var resourceDirectory: URL? {
         if let url = Bundle.main.resourceURL {

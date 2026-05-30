@@ -8,7 +8,8 @@ RESOURCE_DIR="$ROOT_DIR/Sources/VoiceTyper/Resources"
 BIN_DIR="$RESOURCE_DIR/bin"
 LIB_DIR="$RESOURCE_DIR/lib"
 MODEL_DIR="$RESOURCE_DIR/Models"
-MODEL_URL="https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-base.bin"
+MODEL_NAME="ggml-small.bin"
+MODEL_URL="https://huggingface.co/ggerganov/whisper.cpp/resolve/main/$MODEL_NAME"
 
 mkdir -p "$DEPS_DIR" "$BIN_DIR" "$LIB_DIR" "$MODEL_DIR"
 
@@ -38,11 +39,11 @@ if command -v install_name_tool >/dev/null 2>&1; then
     install_name_tool -add_rpath "@executable_path/../lib" "$BIN_DIR/whisper-cli" 2>/dev/null || true
 fi
 
-if [ ! -f "$MODEL_DIR/ggml-base.bin" ]; then
-    curl -L "$MODEL_URL" -o "$MODEL_DIR/ggml-base.bin"
+if [ ! -f "$MODEL_DIR/$MODEL_NAME" ]; then
+    curl -L "$MODEL_URL" -o "$MODEL_DIR/$MODEL_NAME"
 fi
 
 echo "Whisper resources are ready:"
 echo "$BIN_DIR/whisper-cli"
 echo "$LIB_DIR"
-echo "$MODEL_DIR/ggml-base.bin"
+echo "$MODEL_DIR/$MODEL_NAME"

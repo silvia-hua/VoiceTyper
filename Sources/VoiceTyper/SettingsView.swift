@@ -79,7 +79,7 @@ struct SettingsView: View {
 
                     Toggle("输出简体中文", isOn: $appState.settings.convertChineseToSimplified)
 
-                    Text("使用内置 ggml-base.bin 多语言模型和 whisper-cli，本地完成转写，不上传录音。")
+                    Text("使用内置 ggml-small.bin 多语言模型和 whisper-cli，本地完成转写，不上传录音。")
                         .foregroundStyle(.secondary)
 
                     Button("显示 Whisper 资源") {

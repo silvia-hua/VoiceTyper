@@ -30,10 +30,10 @@ swift run VoiceTyper
 
 ```text
 Sources/VoiceTyper/Resources/bin/whisper-cli
-Sources/VoiceTyper/Resources/Models/ggml-base.bin
+Sources/VoiceTyper/Resources/Models/ggml-small.bin
 ```
 
-可以运行下面的脚本下载并构建 whisper.cpp，同时下载 base 多语言模型：
+可以运行下面的脚本下载并构建 whisper.cpp，同时下载 small 多语言模型：
 
 ```bash
 Scripts/bootstrap_whisper.sh
