@@ -1,0 +1,6 @@
+.DS_Store
+.build/
+.deps/
+Sources/VoiceTyper/Resources/Models/*.bin
+Sources/VoiceTyper/Resources/bin/whisper-cli
+Sources/VoiceTyper/Resources/lib/*.dylib
