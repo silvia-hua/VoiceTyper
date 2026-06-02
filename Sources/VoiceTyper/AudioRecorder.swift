@@ -4,12 +4,15 @@ import Foundation
 struct AudioRecording {
     let url: URL
     let duration: TimeInterval
+    let peakPower: Float
 }
 
 @MainActor
 final class AudioRecorder: NSObject {
     private var recorder: AVAudioRecorder?
     private var startedAt: Date?
+    private var meteringTimer: Timer?
+    private var peakPower: Float = -160
 
     func requestPermission() async -> Bool {
         await MicrophonePermission.request()
@@ -33,12 +36,21 @@ final class AudioRecorder: NSObject {
 
         let newRecorder = try AVAudioRecorder(url: url, settings: settings)
         newRecorder.isMeteringEnabled = true
+        newRecorder.prepareToRecord()
         guard newRecorder.record() else {
             throw AudioRecorderError.couldNotStart
         }
 
         recorder = newRecorder
         startedAt = Date()
+        peakPower = -160
+        meteringTimer?.invalidate()
+        meteringTimer = Timer.scheduledTimer(withTimeInterval: 0.08, repeats: true) { [weak self] _ in
+            Task { @MainActor in
+                self?.updatePeakPower()
+            }
+        }
+        RunLoop.main.add(meteringTimer!, forMode: .common)
     }
 
     func stopRecording() throws -> AudioRecording {
@@ -48,7 +60,10 @@ final class AudioRecorder: NSObject {
 
         let url = recorder.url
         let duration = startedAt.map { Date().timeIntervalSince($0) } ?? recorder.currentTime
+        updatePeakPower()
         recorder.stop()
+        meteringTimer?.invalidate()
+        meteringTimer = nil
         self.recorder = nil
         startedAt = nil
 
@@ -56,7 +71,13 @@ final class AudioRecorder: NSObject {
             throw AudioRecorderError.missingFile
         }
 
-        return AudioRecording(url: url, duration: duration)
+        return AudioRecording(url: url, duration: duration, peakPower: peakPower)
+    }
+
+    private func updatePeakPower() {
+        guard let recorder else { return }
+        recorder.updateMeters()
+        peakPower = max(peakPower, recorder.peakPower(forChannel: 0))
     }
 }
 

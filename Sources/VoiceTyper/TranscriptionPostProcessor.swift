@@ -14,4 +14,12 @@ enum TranscriptionPostProcessor {
         CFStringTransform(mutable, nil, "Traditional-Simplified" as CFString, false)
         return mutable as String
     }
+
+    static func isLikelySilenceHallucination(_ text: String) -> Bool {
+        let normalized = text
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+            .trimmingCharacters(in: CharacterSet(charactersIn: ".。!！?？,， "))
+            .lowercased()
+        return ["you", "u"].contains(normalized)
+    }
 }

@@ -209,14 +209,26 @@ final class AppState: ObservableObject {
                     isStopping = false
                     return
                 }
+                guard recording.peakPower > -55 else {
+                    try? FileManager.default.removeItem(at: recording.url)
+                    status = .failure("没有检测到清晰声音，请检查麦克风输入")
+                    isStopping = false
+                    return
+                }
+                defer {
+                    try? FileManager.default.removeItem(at: recording.url)
+                }
 
                 status = .transcribing
                 let rawText = try await transcriber.transcribe(audioURL: recording.url, language: settings.language)
-                try? FileManager.default.removeItem(at: recording.url)
-                let text = TranscriptionPostProcessor.process(rawText, settings: settings)
+                var text = TranscriptionPostProcessor.process(rawText, settings: settings)
+                if settings.language == "auto", TranscriptionPostProcessor.isLikelySilenceHallucination(text) {
+                    let retryText = try await transcriber.transcribe(audioURL: recording.url, language: "zh")
+                    text = TranscriptionPostProcessor.process(retryText, settings: settings)
+                }
 
-                guard !text.isEmpty else {
-                    status = .failure("没有识别到文字")
+                guard !text.isEmpty, !TranscriptionPostProcessor.isLikelySilenceHallucination(text) else {
+                    status = .failure("没有检测到有效语音")
                     isStopping = false
                     return
                 }
